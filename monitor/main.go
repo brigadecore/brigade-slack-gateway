@@ -1,0 +1,46 @@
+package main
+
+import (
+	"log"
+
+	"github.com/brigadecore/brigade-foundations/signals"
+	"github.com/brigadecore/brigade-foundations/version"
+	"github.com/brigadecore/brigade/sdk/v2/core"
+	"github.com/brigadecore/brigade/sdk/v2/system"
+)
+
+func main() {
+
+	log.Printf(
+		"Starting Brigade Slack Gateway Monitor -- version %s -- commit %s",
+		version.Version(),
+		version.Commit(),
+	)
+
+	// Brigade System and Events API clients
+	var systemClient system.APIClient
+	var eventsClient core.EventsClient
+	{
+		address, token, opts, err := apiClientConfig()
+		if err != nil {
+			log.Fatal(err)
+		}
+		systemClient = system.NewAPIClient(address, token, &opts)
+		eventsClient = core.NewEventsClient(address, token, &opts)
+	}
+
+	var monitor *monitor
+	{
+		config, err := getMonitorConfig()
+		if err != nil {
+			log.Fatal(err)
+		}
+		monitor, err = newMonitor(systemClient, eventsClient, config)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	// Run it!
+	log.Println(monitor.run(signals.Context()))
+}

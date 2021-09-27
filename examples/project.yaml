@@ -1,0 +1,27 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/brigadecore/brigade/v2/v2/apiserver/schemas/project.json
+apiVersion: brigade.sh/v2-beta
+kind: Project
+metadata:
+  id: rocket-blaster
+description: An example of launching rockets (not really) with Slack and Brigade
+spec:
+  eventSubscriptions:
+  - source: brigade.sh/slack
+    qualifiers:
+      appID: <your appID here>
+    types:
+    - launch
+  workerTemplate:
+    logLevel: DEBUG
+    defaultConfigFiles:
+      brigade.js: |
+        const { events } = require("@brigadecore/brigadier");
+
+        events.on("brigade.sh/slack", "launch", () => {
+          console.log("Rocket launched!");
+          // Strings returned from event handlers automatically become the
+          // event's summary.
+          return "Rocket launched!"
+        });
+
+        events.process();

@@ -1,0 +1,50 @@
+{{- if .Values.receiver.ingress.enabled }}
+{{- $networkingApiIsStable := eq (include "networking.apiVersion.isStable" .) "true" -}}
+{{- $networkingApiSupportsIngressClassName := eq (include "networking.apiVersion.supportIngressClassName" .) "true" -}}
+apiVersion: {{ template "networking.apiVersion" . }}
+kind: Ingress
+metadata:
+  name: {{ include "gateway.receiver.fullname" . }}
+  labels:
+    {{- include "gateway.labels" . | nindent 4 }}
+    {{- include "gateway.receiver.labels" . | nindent 4 }}
+  {{- with .Values.receiver.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if and (.Values.receiver.ingress.ingressClassName) ($networkingApiSupportsIngressClassName) }}
+  ingressClassName: {{ .Values.receiver.ingress.ingressClassName }}
+  {{- end }}
+  rules:
+  - host: {{ .Values.receiver.host }}
+    http:
+      paths:
+      {{- if $networkingApiIsStable }}
+      - pathType: ImplementationSpecific
+        path: /
+        backend:
+          service:
+            name: {{ include "gateway.receiver.fullname" . }}
+            port:
+              {{- if .Values.receiver.tls.enabled }}
+              number: 443
+              {{- else }}
+              number: 80
+              {{- end }}
+      {{- else }}
+      - backend:
+          serviceName: {{ include "gateway.receiver.fullname" . }}
+          {{- if .Values.receiver.tls.enabled }}
+          servicePort: 443
+          {{- else }}
+          servicePort: 80
+          {{- end }}
+      {{- end}}
+  {{- if .Values.receiver.ingress.tls.enabled }}
+  tls:
+  - hosts:
+    - {{ .Values.receiver.host }}
+    secretName: {{ include "gateway.receiver.fullname" . }}-ingress-cert
+  {{- end }}
+{{- end }}

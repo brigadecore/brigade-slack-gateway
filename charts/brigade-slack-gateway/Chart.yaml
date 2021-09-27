@@ -1,0 +1,13 @@
+apiVersion: v2
+name: brigade-slack-gateway
+description: |
+  The Brigade Slack Gateway
+type: application
+version: 0.1.0
+appVersion: v0.1.0
+icon: https://raw.githubusercontent.com/brigadecore/brigade-slack-gateway/main/logo.png
+sources:
+- https://github.com/brigadecore/brigade-slack-gateway
+maintainers:
+- name: The Brigade Maintainers
+  email: cncf-brigade-maintainers@lists.cncf.io
