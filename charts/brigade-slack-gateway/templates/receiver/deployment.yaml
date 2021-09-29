@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "gateway.receiver.fullname" . }}
+  labels:
+    {{- include "gateway.labels" . | nindent 4 }}
+    {{- include "gateway.receiver.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.receiver.replicas }}
+  selector:
+    matchLabels:
+      {{- include "gateway.selectorLabels" . | nindent 6 }}
+      {{- include "gateway.receiver.labels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "gateway.selectorLabels" . | nindent 8 }}
+        {{- include "gateway.receiver.labels" . | nindent 8 }}
+      annotations:
+        checksum/secret: {{ include (print $.Template.BasePath "/common/secret.yaml") . | sha256sum }}
+        {{- if .Values.receiver.tls.enabled }}
+        checksum/cert-secret: {{ include (print $.Template.BasePath "/receiver/cert-secret.yaml") . | sha256sum }}
+        {{- end }}
+        checksum/config-secret: {{ include (print $.Template.BasePath "/common/config-secret.yaml") . | sha256sum }}
+    spec:
+      containers:
+      - name: gateway
+        image: {{ .Values.receiver.image.repository }}:{{ default .Chart.AppVersion .Values.receiver.image.tag }}
+        imagePullPolicy: {{ .Values.receiver.image.pullPolicy }}
+        env:
+        - name: TLS_ENABLED
+          value: {{ quote .Values.receiver.tls.enabled }}
+        {{- if .Values.receiver.tls.enabled }}
+        - name: TLS_CERT_PATH
+          value: /app/certs/tls.crt
+        - name: TLS_KEY_PATH
+          value: /app/certs/tls.key
+        {{- end }}
+        - name: API_ADDRESS
+          value: {{ .Values.brigade.apiAddress }}
+        - name: API_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "gateway.fullname" . }}
+              key: brigadeAPIToken
+        - name: API_IGNORE_CERT_WARNINGS
+          value: {{ quote .Values.brigade.apiIgnoreCertWarnings }}
+        - name: SLACK_APPS_PATH
+          value: /app/config/slack-apps.json
+        volumeMounts:
+        {{- if .Values.receiver.tls.enabled }}
+        - name: cert
+          mountPath: /app/certs
+          readOnly: true
+        {{- end }}
+        - name: config
+          mountPath: /app/config
+          readOnly: true
+        livenessProbe:
+          httpGet:
+            port: 8080
+            path: /healthz
+            {{- if .Values.receiver.tls.enabled }}
+            scheme: HTTPS
+            {{- end }}
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            port: 8080
+            path: /healthz
+            {{- if .Values.receiver.tls.enabled }}
+            scheme: HTTPS
+            {{- end }}
+          initialDelaySeconds: 10
+          periodSeconds: 10
+      volumes:
+      {{- if .Values.receiver.tls.enabled }}
+      - name: cert
+        secret:
+          secretName: {{ include "gateway.receiver.fullname" . }}-cert
+      {{- end }}
+      - name: config
+        secret:
+          secretName: {{ include "gateway.fullname" . }}-config
+      {{- with .Values.receiver.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.receiver.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
