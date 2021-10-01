@@ -51,16 +51,16 @@ through the steps for setting up just one.
 * Click __Create New App__ and __From scratch__.
 
 * Specify an __App Name__, select the workspace to install your new App into,
-  and click __Create App_. This will create the App and take you to the App's
+  and click __Create App__. This will create the App and take you to the App's
   own page.
 
-* Under the heading __Add features and functionality__, click __Slash Commands_,
-  and then __Create New Command__.
+* Under the heading __Add features and functionality__, click
+  __Slash Commands__, and then __Create New Command__.
 
 * Set __Command__ to be the word, with a leading slash (`/`), that should
   trigger an event. Example: `/demo`.
 
-* Set the Request URL__ to 
+* Set the __Request URL__ to 
   `https://<your gateway domain or subdomain name>/slash-commands`.
     * If you're not using a domain or subdomain name and want to use a public IP
       here instead, put a placeholder such as
