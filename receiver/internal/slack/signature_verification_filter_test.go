@@ -24,7 +24,7 @@ func TestNewSignatureVerificationFilter(t *testing.T) {
 			},
 		},
 	}
-	filter :=
+	filter := // nolint: forcetypeassert
 		NewSignatureVerificationFilter(testConfig).(*signatureVerificationFilter)
 	require.Equal(t, testConfig, filter.config)
 }
@@ -45,7 +45,7 @@ func TestSignatureVerificationFilter(t *testing.T) {
 	testCases := []struct {
 		name       string
 		setup      func() *http.Request
-		assertions func(handlerCalled bool, rr *httptest.ResponseRecorder)
+		assertions func(handlerCalled bool, r *http.Response)
 	}{
 		{
 			name: "signature cannot be verified",
@@ -58,8 +58,8 @@ func TestSignatureVerificationFilter(t *testing.T) {
 				req.Header.Add("X-Slack-Signature", "johnhancock")
 				return req
 			},
-			assertions: func(handlerCalled bool, rr *httptest.ResponseRecorder) {
-				require.Equal(t, http.StatusForbidden, rr.Code)
+			assertions: func(handlerCalled bool, r *http.Response) {
+				require.Equal(t, http.StatusForbidden, r.StatusCode)
 				require.False(t, handlerCalled)
 			},
 		},
@@ -93,8 +93,8 @@ func TestSignatureVerificationFilter(t *testing.T) {
 				)
 				return req
 			},
-			assertions: func(handlerCalled bool, rr *httptest.ResponseRecorder) {
-				require.Equal(t, http.StatusOK, rr.Code)
+			assertions: func(handlerCalled bool, r *http.Response) {
+				require.Equal(t, http.StatusOK, r.StatusCode)
 				require.True(t, handlerCalled)
 			},
 		},
@@ -105,10 +105,11 @@ func TestSignatureVerificationFilter(t *testing.T) {
 			req := testCase.setup()
 			handlerCalled := false
 			testFilter.Decorate(func(w http.ResponseWriter, r *http.Request) {
+				defer r.Body.Close()
 				handlerCalled = true
 				w.WriteHeader(http.StatusOK)
 			})(rr, req)
-			testCase.assertions(handlerCalled, rr)
+			testCase.assertions(handlerCalled, rr.Result()) // nolint: bodyclose
 		})
 	}
 }

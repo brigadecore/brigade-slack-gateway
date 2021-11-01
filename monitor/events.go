@@ -96,13 +96,20 @@ func (m *monitor) reportEventStatus(event core.Event) error {
 		"Authorization",
 		fmt.Sprintf("Bearer %s", app.APIToken),
 	)
-	if resp, err := m.httpSendFn(req); err != nil {
+	resp, err := m.httpSendFn(req)
+	if err != nil {
 		return errors.Wrapf(
 			err,
 			"error sending slack status message for event %q",
 			event.ID,
 		)
-	} else if resp.StatusCode != http.StatusOK {
+	}
+	defer func() {
+		if resp.Body != nil {
+			resp.Body.Close()
+		}
+	}()
+	if resp.StatusCode != http.StatusOK {
 		return errors.Errorf(
 			"error sending slack status message for event %q: received status "+
 				"code %d",

@@ -61,7 +61,7 @@ func (s *slashCommandService) Handle(
 				"tracking": "true",
 			},
 		},
-		Payload: string(command.Text),
+		Payload: command.Text,
 	}
 	// This information is only present for Slack Enterprise Grid customers. We're
 	// only including the label for those cases rather than always including it
