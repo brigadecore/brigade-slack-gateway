@@ -59,7 +59,9 @@ func TestNewSlashCommandHandlerServeHTTP(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			rr := httptest.NewRecorder()
 			testCase.handler.ServeHTTP(rr, testRequest)
-			testCase.assertions(rr.Result()) // nolint: bodyclose
+			res := rr.Result()
+			defer res.Body.Close()
+			testCase.assertions(res)
 		})
 	}
 }
