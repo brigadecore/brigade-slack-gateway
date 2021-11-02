@@ -49,10 +49,8 @@ func main() {
 		router.StrictSlash(true)
 		router.Handle(
 			"/slash-commands",
-			http.HandlerFunc( // Make a handler from a function
-				signatureVerificationFilter.Decorate(
-					slack.NewSlashCommandHandler(slashCommandsService).ServeHTTP,
-				),
+			signatureVerificationFilter.Decorate(
+				slack.NewSlashCommandHandler(slashCommandsService).ServeHTTP,
 			),
 		).Methods(http.MethodPost)
 		router.HandleFunc("/healthz", libHTTP.Healthz).Methods(http.MethodGet)

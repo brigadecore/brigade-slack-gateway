@@ -26,7 +26,7 @@ func TestNewSlashCommandHandlerServeHTTP(t *testing.T) {
 	testCases := []struct {
 		name       string
 		handler    *slashCommandHandler
-		assertions func(*httptest.ResponseRecorder)
+		assertions func(*http.Response)
 	}{
 		{
 			name: "error invoking service",
@@ -37,8 +37,8 @@ func TestNewSlashCommandHandlerServeHTTP(t *testing.T) {
 					},
 				},
 			},
-			assertions: func(rr *httptest.ResponseRecorder) {
-				require.Equal(t, http.StatusInternalServerError, rr.Result().StatusCode)
+			assertions: func(r *http.Response) {
+				require.Equal(t, http.StatusInternalServerError, r.StatusCode)
 			},
 		},
 		{
@@ -50,8 +50,8 @@ func TestNewSlashCommandHandlerServeHTTP(t *testing.T) {
 					},
 				},
 			},
-			assertions: func(rr *httptest.ResponseRecorder) {
-				require.Equal(t, http.StatusOK, rr.Result().StatusCode)
+			assertions: func(r *http.Response) {
+				require.Equal(t, http.StatusOK, r.StatusCode)
 			},
 		},
 	}
@@ -59,7 +59,7 @@ func TestNewSlashCommandHandlerServeHTTP(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			rr := httptest.NewRecorder()
 			testCase.handler.ServeHTTP(rr, testRequest)
-			testCase.assertions(rr)
+			testCase.assertions(rr.Result()) // nolint: bodyclose
 		})
 	}
 }
