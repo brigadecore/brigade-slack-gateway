@@ -24,8 +24,9 @@ func TestNewSignatureVerificationFilter(t *testing.T) {
 			},
 		},
 	}
-	filter := // nolint: forcetypeassert
+	filter, ok :=
 		NewSignatureVerificationFilter(testConfig).(*signatureVerificationFilter)
+	require.True(t, ok)
 	require.Equal(t, testConfig, filter.config)
 }
 
@@ -109,7 +110,9 @@ func TestSignatureVerificationFilter(t *testing.T) {
 				handlerCalled = true
 				w.WriteHeader(http.StatusOK)
 			})(rr, req)
-			testCase.assertions(handlerCalled, rr.Result()) // nolint: bodyclose
+			res := rr.Result()
+			defer res.Body.Close()
+			testCase.assertions(handlerCalled, res)
 		})
 	}
 }
