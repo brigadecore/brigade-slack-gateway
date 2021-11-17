@@ -166,6 +166,10 @@ Edit `~/brigade-slack-gateway-values.yaml`, making the following changes:
 * `receiver.host`: Set this to the host name where you'd like the gateway to be
   accessible.
 
+* `receiver.service.type`: If you plan to enable ingress (advanced), you can
+  leave this as its default -- `ClusterIP`. If you do not plan to enable
+  ingress, you probably will want to change this value to `LoadBalancer`.
+
 Save your changes to `~/brigade-slack-gateway-values.yaml` and use the following
 command to install the gateway using the above customizations:
 
@@ -175,13 +179,15 @@ $ helm install brigade-slack-gateway \
     --version v0.1.0 \
     --create-namespace \
     --namespace brigade-slack-gateway \
-    --values ~/brigade-slack-gateway-values.yaml
+    --values ~/brigade-slack-gateway-values.yaml \
+    --wait \
+    --timeout 300s
 ```
 
 ### 4. (RECOMMENDED) Create a DNS Entry
 
-If you installed the gateway without enabling support for an ingress controller,
-this command should help you find the gateway's public IP address:
+If you overrode defaults and set `receiver.service.type` to `LoadBalancer`, use
+this command to find the gateway's public IP address:
 
 ```console
 $ kubectl get svc brigade-slack-gateway-receiver \
