@@ -6,8 +6,8 @@ github.com/Masterminds/sprig v2.22.0+incompatible h1:z4yfnGrZ7netVz+0EDJ0Wi+5VZC
 github.com/Masterminds/sprig v2.22.0+incompatible/go.mod h1:y6hNFY5UBTIWBxnzTeuNhlNS5hqE0NB0E6fgfo2Br3o=
 github.com/brigadecore/brigade-foundations v0.3.0 h1:galsMzxSprURAEc2pxsmYJandiW4D+Npchx6ZiBIHkY=
 github.com/brigadecore/brigade-foundations v0.3.0/go.mod h1:edMgSJCUgfHN1RNGiiVOTRW4X4VykBLgssgWHPZK7Sg=
-github.com/brigadecore/brigade/sdk/v2 v2.0.0-beta.3 h1:x6mEe64lvaG1b0Wxs0akA8fZ0kwseCAwMyI6/sbiGms=
-github.com/brigadecore/brigade/sdk/v2 v2.0.0-beta.3/go.mod h1:rB3y/pIheORX5AHbxaSAw5Xr/U6bUAUtSLkgJcbOHIY=
+github.com/brigadecore/brigade/sdk/v2 v2.0.0-rc.1 h1:VVGS/GOA1jSmEXTIOk54rf9GsqCxwosoulrA1OwC2xg=
+github.com/brigadecore/brigade/sdk/v2 v2.0.0-rc.1/go.mod h1:rB3y/pIheORX5AHbxaSAw5Xr/U6bUAUtSLkgJcbOHIY=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=

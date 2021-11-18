@@ -219,7 +219,7 @@ the gateway, provided they've originated from the fictitious Slack app with the
 ID `FAKEAPPID` (see the `appID` qualifier).
 
 ```yaml
-apiVersion: brigade.sh/v2-beta
+apiVersion: brigade.sh/v2
 kind: Project
 metadata:
   id: slack-demo
@@ -246,7 +246,7 @@ spec:
 In the alternative example below, we subscribe _only_ to `demo` events:
 
 ```yaml
-apiVersion: brigade.sh/v2-beta
+apiVersion: brigade.sh/v2
 kind: Project
 metadata:
   id: slack-demo
@@ -312,7 +312,7 @@ entered by the Slack user.
 Here is an abbreviated representation of a sample event emitted by this gateway:
 
 ```yaml
-apiVersion: brigade.sh/v2-beta
+apiVersion: brigade.sh/v2
 kind: Event
 metadata:
   created: "2021-09-24T20:46:47.037Z"
