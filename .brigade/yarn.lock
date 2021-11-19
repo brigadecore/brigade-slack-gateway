@@ -2,20 +2,20 @@
 # yarn lockfile v1
 
 
-"@brigadecore/brigadier@^2.0.0-beta.3":
-  version "2.0.0-beta.3"
-  resolved "https://registry.yarnpkg.com/@brigadecore/brigadier/-/brigadier-2.0.0-beta.3.tgz#ca8d60129f18ba84dcca77f28f534c9ccbed4a43"
-  integrity sha512-tOfJ1jnnRR80pMfN6NPsG3AJqgoefUHrzFOcLZHGoz2OdIG+Q10GzM8Km32r+LnhPImWQ0V4PVi06fGP2q1+bQ==
+"@brigadecore/brigadier@^2.0.0-rc.1":
+  version "2.0.0-rc.1"
+  resolved "https://registry.yarnpkg.com/@brigadecore/brigadier/-/brigadier-2.0.0-rc.1.tgz#e653815a475261db501d3262512f8f5fc8b37ffd"
+  integrity sha512-k56htqw5L/PKA8xNqLEGzbqx1OmMzqHWxqL7SKvrCAElZsTqZuFvZJZs4RWPl66k9zegZ5ol977g0QcQxae2tw==
   dependencies:
-    "@types/node" "^14.14.11"
-    typescript "4.1.6"
+    "@types/node" "^16.10.3"
+    typescript "4.4.3"
 
-"@types/node@^14.14.11":
-  version "14.17.6"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.17.6.tgz#cc61c8361c89e70c468cda464d1fa3dd7e5ebd62"
-  integrity sha512-iBxsxU7eswQDGhlr3AiamBxOssaYxbM+NKXVil8jg9yFXvrfEFbDumLD/2dMTB+zYyg7w+Xjt8yuxfdbUHAtcQ==
+"@types/node@^16.10.3":
+  version "16.11.8"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-16.11.8.tgz#a1aeb23f0aa33cb111e64ccaa1687b2ae0423b69"
+  integrity sha512-hmT5gfpRkkHr7DZZHMf3jBe/zNcVGN+jXSL2f8nAsYfBPxQFToKwQlS/zES4Sjp488Bi73i+p6bvrNRRGU0x9Q==
 
-typescript@4.1.6:
-  version "4.1.6"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.1.6.tgz#1becd85d77567c3c741172339e93ce2e69932138"
-  integrity sha512-pxnwLxeb/Z5SP80JDRzVjh58KsM6jZHRAOtTpS7sXLS4ogXNKC9ANxHHZqLLeVHZN35jCtI4JdmLLbLiC1kBow==
+typescript@4.4.3:
+  version "4.4.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.4.3.tgz#bdc5407caa2b109efd4f82fe130656f977a29324"
+  integrity sha512-4xfscpisVgqqDfPaJo5vkd+Qd/ItkoagnHpufr+i2QCHBsNYp+G7UAoyFl8aPtx879u38wPV65rZ8qbGZijalA==
