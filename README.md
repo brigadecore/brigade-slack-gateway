@@ -140,7 +140,7 @@ a file you can modify:
 
 ```console
 $ helm inspect values oci://ghcr.io/brigadecore/brigade-slack-gateway \
-    --version v0.1.0 > ~/brigade-slack-gateway-values.yaml
+    --version v0.2.0 > ~/brigade-slack-gateway-values.yaml
 ```
 
 Edit `~/brigade-slack-gateway-values.yaml`, making the following changes:
@@ -176,7 +176,7 @@ command to install the gateway using the above customizations:
 ```console
 $ helm install brigade-slack-gateway \
     oci://ghcr.io/brigadecore/brigade-slack-gateway \
-    --version v0.1.0 \
+    --version v0.2.0 \
     --create-namespace \
     --namespace brigade-slack-gateway \
     --values ~/brigade-slack-gateway-values.yaml \
