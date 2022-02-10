@@ -12,8 +12,7 @@ import (
 
 	"github.com/Masterminds/sprig"
 	"github.com/brigadecore/brigade-slack-gateway/internal/slack"
-	"github.com/brigadecore/brigade/sdk/v2/core"
-	"github.com/brigadecore/brigade/sdk/v2/system"
+	"github.com/brigadecore/brigade/sdk/v3"
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/pkg/errors"
 )
@@ -36,19 +35,19 @@ type monitor struct {
 	// All of these internal functions are overridable for testing purposes
 	runHealthcheckLoopFn        func(context.Context)
 	monitorEventsFn             func(context.Context)
-	reportEventStatusFn         func(core.Event) error
+	reportEventStatusFn         func(sdk.Event) error
 	errFn                       func(...interface{})
-	prepareEventStatusMessageFn func(core.Event) (*bytes.Buffer, error)
+	prepareEventStatusMessageFn func(sdk.Event) (*bytes.Buffer, error)
 	httpSendFn                  func(*http.Request) (*http.Response, error)
-	systemClient                system.APIClient
-	eventsClient                core.EventsClient
+	systemClient                sdk.SystemClient
+	eventsClient                sdk.EventsClient
 	statusMsgTemplate           *template.Template
 }
 
 // newMonitor initializes and returns a monitor.
 func newMonitor(
-	systemClient system.APIClient,
-	eventsClient core.EventsClient,
+	systemClient sdk.SystemClient,
+	eventsClient sdk.EventsClient,
 	config monitorConfig,
 ) (*monitor, error) {
 	retryClient := retryablehttp.NewClient()

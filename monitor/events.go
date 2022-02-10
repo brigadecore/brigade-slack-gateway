@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/brigadecore/brigade/sdk/v2/core"
-	"github.com/brigadecore/brigade/sdk/v2/meta"
+	"github.com/brigadecore/brigade/sdk/v3"
+	"github.com/brigadecore/brigade/sdk/v3/meta"
 	"github.com/pkg/errors"
 )
 
@@ -21,11 +21,11 @@ func (m *monitor) monitorEvents(ctx context.Context) {
 		for {
 			events, err := m.eventsClient.List(
 				ctx,
-				&core.EventsSelector{
+				&sdk.EventsSelector{
 					Source: "brigade.sh/slack",
 					// We only want to report back to Slack once an event's worker reaches
 					// a terminal phase.
-					WorkerPhases: core.WorkerPhasesTerminal(),
+					WorkerPhases: sdk.WorkerPhasesTerminal(),
 					SourceState: map[string]string{
 						// Only select events that are to be tracked.
 						"tracking": "true",
@@ -59,7 +59,7 @@ func (m *monitor) monitorEvents(ctx context.Context) {
 	}
 }
 
-func (m *monitor) reportEventStatus(event core.Event) error {
+func (m *monitor) reportEventStatus(event sdk.Event) error {
 	appID, ok := event.Qualifiers["appID"]
 	if !ok {
 		return errors.Errorf(
@@ -122,7 +122,8 @@ func (m *monitor) reportEventStatus(event core.Event) error {
 	if err := m.eventsClient.UpdateSourceState(
 		context.Background(),
 		event.ID,
-		core.SourceState{},
+		sdk.SourceState{},
+		nil,
 	); err != nil {
 		return errors.Wrapf(
 			err,
@@ -134,7 +135,7 @@ func (m *monitor) reportEventStatus(event core.Event) error {
 }
 
 func (m *monitor) prepareEventStatusMessage(
-	event core.Event,
+	event sdk.Event,
 ) (*bytes.Buffer, error) {
 	buffer := &bytes.Buffer{}
 	err := m.statusMsgTemplate.Execute(buffer, event)

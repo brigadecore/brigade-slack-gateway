@@ -7,9 +7,9 @@ import (
 	"text/template"
 
 	"github.com/Masterminds/sprig"
-	"github.com/brigadecore/brigade/sdk/v2/core"
-	"github.com/brigadecore/brigade/sdk/v2/meta"
-	coreTesting "github.com/brigadecore/brigade/sdk/v2/testing/core"
+	"github.com/brigadecore/brigade/sdk/v3"
+	"github.com/brigadecore/brigade/sdk/v3/meta"
+	sdkTesting "github.com/brigadecore/brigade/sdk/v3/testing"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 )
@@ -18,8 +18,8 @@ func TestNewSlashCommandService(t *testing.T) {
 	s, err := NewSlashCommandService(
 		// Totally unusable client that is enough to fulfill the dependencies for
 		// this test...
-		&coreTesting.MockEventsClient{
-			LogsClient: &coreTesting.MockLogsClient{},
+		&sdkTesting.MockEventsClient{
+			LogsClient: &sdkTesting.MockLogsClient{},
 		},
 	)
 	require.NoError(t, err)
@@ -44,9 +44,13 @@ func TestSlashCommandServiceHandle(t *testing.T) {
 		{
 			name: "error creating brigade event",
 			service: &slashCommandService{
-				eventsClient: &coreTesting.MockEventsClient{
-					CreateFn: func(context.Context, core.Event) (core.EventList, error) {
-						return core.EventList{}, errors.New("something went wrong")
+				eventsClient: &sdkTesting.MockEventsClient{
+					CreateFn: func(
+						context.Context,
+						sdk.Event,
+						*sdk.EventCreateOptions,
+					) (sdk.EventList, error) {
+						return sdk.EventList{}, errors.New("something went wrong")
 					},
 				},
 			},
@@ -63,11 +67,12 @@ func TestSlashCommandServiceHandle(t *testing.T) {
 		{
 			name: "success with no subscribers",
 			service: &slashCommandService{
-				eventsClient: &coreTesting.MockEventsClient{
+				eventsClient: &sdkTesting.MockEventsClient{
 					CreateFn: func(
 						_ context.Context,
-						event core.Event,
-					) (core.EventList, error) {
+						event sdk.Event,
+						_ *sdk.EventCreateOptions,
+					) (sdk.EventList, error) {
 						require.Equal(t, "brigade.sh/slack", event.Source)
 						require.Equal(t, "foo", event.Type)
 						require.Equal(
@@ -94,7 +99,7 @@ func TestSlashCommandServiceHandle(t *testing.T) {
 							event.SourceState.State,
 						)
 						require.Equal(t, "bar", event.Payload)
-						return core.EventList{}, nil
+						return sdk.EventList{}, nil
 					},
 				},
 			},
@@ -112,11 +117,12 @@ func TestSlashCommandServiceHandle(t *testing.T) {
 		{
 			name: "success with subscribers",
 			service: &slashCommandService{
-				eventsClient: &coreTesting.MockEventsClient{
+				eventsClient: &sdkTesting.MockEventsClient{
 					CreateFn: func(
 						_ context.Context,
-						event core.Event,
-					) (core.EventList, error) {
+						event sdk.Event,
+						_ *sdk.EventCreateOptions,
+					) (sdk.EventList, error) {
 						require.Equal(t, "brigade.sh/slack", event.Source)
 						require.Equal(t, "foo", event.Type)
 						require.Equal(
@@ -143,8 +149,8 @@ func TestSlashCommandServiceHandle(t *testing.T) {
 							event.SourceState.State,
 						)
 						require.Equal(t, "bar", event.Payload)
-						return core.EventList{
-							Items: []core.Event{
+						return sdk.EventList{
+							Items: []sdk.Event{
 								{
 									ObjectMeta: meta.ObjectMeta{
 										ID: "123456789",
