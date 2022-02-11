@@ -10,7 +10,7 @@ import (
 	"github.com/brigadecore/brigade-foundations/os"
 	libSlack "github.com/brigadecore/brigade-slack-gateway/internal/slack"
 	"github.com/brigadecore/brigade-slack-gateway/receiver/internal/slack"
-	"github.com/brigadecore/brigade/sdk/v2/restmachinery"
+	"github.com/brigadecore/brigade/sdk/v3/restmachinery"
 	"github.com/pkg/errors"
 )
 

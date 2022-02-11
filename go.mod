@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/brigadecore/brigade-foundations v0.3.0
-	github.com/brigadecore/brigade/sdk/v2 v2.0.0
+	github.com/brigadecore/brigade/sdk/v3 v3.0.0
 	github.com/gorilla/mux v1.8.0
 	github.com/hashicorp/go-retryablehttp v0.6.7
 	github.com/kr/text v0.2.0 // indirect

@@ -6,7 +6,7 @@ import (
 	"text/template"
 
 	"github.com/Masterminds/sprig"
-	"github.com/brigadecore/brigade/sdk/v2/core"
+	"github.com/brigadecore/brigade/sdk/v3"
 	"github.com/pkg/errors"
 )
 
@@ -19,14 +19,14 @@ type SlashCommandService interface {
 }
 
 type slashCommandService struct {
-	eventsClient   core.EventsClient
+	eventsClient   sdk.EventsClient
 	ackMsgTemplate *template.Template
 }
 
 // NewSlashCommandService returns an implementation of the Service interface for
 // handling slash commands from Slack.
 func NewSlashCommandService(
-	eventsClient core.EventsClient,
+	eventsClient sdk.EventsClient,
 ) (SlashCommandService, error) {
 	ackMsgTemplate, err :=
 		template.New("template").Funcs(sprig.TxtFuncMap()).Parse(ackMsgTemplate)
@@ -43,7 +43,7 @@ func (s *slashCommandService) Handle(
 	ctx context.Context,
 	command SlashCommand,
 ) ([]byte, error) {
-	event := core.Event{
+	event := sdk.Event{
 		Source: "brigade.sh/slack",
 		Type:   command.Command[1:], // Strip the leading slash from the command
 		// A workspace can have multiple apps installed that all use the same slash
@@ -56,7 +56,7 @@ func (s *slashCommandService) Handle(
 			"channelID": command.ChannelID,
 			"userID":    command.UserID,
 		},
-		SourceState: &core.SourceState{
+		SourceState: &sdk.SourceState{
 			State: map[string]string{
 				"tracking": "true",
 			},
@@ -69,13 +69,13 @@ func (s *slashCommandService) Handle(
 	if command.EnterpriseID != "" {
 		event.Labels["enterprise_id"] = command.EnterpriseID
 	}
-	events, err := s.eventsClient.Create(context.Background(), event)
+	events, err := s.eventsClient.Create(context.Background(), event, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "error emitting event(s) into Brigade")
 	}
 	message := struct {
 		Channel string
-		Events  []core.Event
+		Events  []sdk.Event
 	}{
 		Channel: command.ChannelID,
 		Events:  events.Items,

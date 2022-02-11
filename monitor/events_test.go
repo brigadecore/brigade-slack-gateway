@@ -11,9 +11,9 @@ import (
 
 	"github.com/Masterminds/sprig"
 	"github.com/brigadecore/brigade-slack-gateway/internal/slack"
-	"github.com/brigadecore/brigade/sdk/v2/core"
-	"github.com/brigadecore/brigade/sdk/v2/meta"
-	coreTesting "github.com/brigadecore/brigade/sdk/v2/testing/core"
+	"github.com/brigadecore/brigade/sdk/v3"
+	"github.com/brigadecore/brigade/sdk/v3/meta"
+	sdkTesting "github.com/brigadecore/brigade/sdk/v3/testing"
 	"github.com/stretchr/testify/require"
 )
 
@@ -29,13 +29,13 @@ func TestMonitorEvents(t *testing.T) {
 				config: monitorConfig{
 					listEventsInterval: time.Second,
 				},
-				eventsClient: &coreTesting.MockEventsClient{
+				eventsClient: &sdkTesting.MockEventsClient{
 					ListFn: func(
 						context.Context,
-						*core.EventsSelector,
+						*sdk.EventsSelector,
 						*meta.ListOptions,
-					) (core.EventList, error) {
-						return core.EventList{}, errors.New("something went wrong")
+					) (sdk.EventList, error) {
+						return sdk.EventList{}, errors.New("something went wrong")
 					},
 				},
 			},
@@ -51,14 +51,14 @@ func TestMonitorEvents(t *testing.T) {
 				config: monitorConfig{
 					listEventsInterval: time.Second,
 				},
-				eventsClient: &coreTesting.MockEventsClient{
+				eventsClient: &sdkTesting.MockEventsClient{
 					ListFn: func(
 						context.Context,
-						*core.EventsSelector,
+						*sdk.EventsSelector,
 						*meta.ListOptions,
-					) (core.EventList, error) {
-						return core.EventList{
-							Items: []core.Event{
+					) (sdk.EventList, error) {
+						return sdk.EventList{
+							Items: []sdk.Event{
 								{
 									ObjectMeta: meta.ObjectMeta{
 										ID: "tunguska",
@@ -68,7 +68,7 @@ func TestMonitorEvents(t *testing.T) {
 						}, nil
 					},
 				},
-				reportEventStatusFn: func(core.Event) error {
+				reportEventStatusFn: func(sdk.Event) error {
 					return nil
 				},
 			},
@@ -98,13 +98,13 @@ func TestMonitorReportEventStatus(t *testing.T) {
 	testCases := []struct {
 		name       string
 		monitor    *monitor
-		event      core.Event
+		event      sdk.Event
 		assertions func(error)
 	}{
 		{
 			name:    "appID label missing",
 			monitor: &monitor{},
-			event:   core.Event{},
+			event:   sdk.Event{},
 			assertions: func(err error) {
 				require.Error(t, err)
 				require.Contains(t, err.Error(), "no slack app ID found in event")
@@ -115,7 +115,7 @@ func TestMonitorReportEventStatus(t *testing.T) {
 			monitor: &monitor{
 				config: monitorConfig{},
 			},
-			event: core.Event{
+			event: sdk.Event{
 				Qualifiers: map[string]string{
 					"appID": "42",
 				},
@@ -133,11 +133,11 @@ func TestMonitorReportEventStatus(t *testing.T) {
 						"42": {},
 					},
 				},
-				prepareEventStatusMessageFn: func(core.Event) (*bytes.Buffer, error) {
+				prepareEventStatusMessageFn: func(sdk.Event) (*bytes.Buffer, error) {
 					return nil, errors.New("something went wrong")
 				},
 			},
-			event: core.Event{
+			event: sdk.Event{
 				Qualifiers: map[string]string{
 					"appID": "42",
 				},
@@ -160,14 +160,14 @@ func TestMonitorReportEventStatus(t *testing.T) {
 						"42": {},
 					},
 				},
-				prepareEventStatusMessageFn: func(core.Event) (*bytes.Buffer, error) {
+				prepareEventStatusMessageFn: func(sdk.Event) (*bytes.Buffer, error) {
 					return bytes.NewBufferString("this is a status message"), nil
 				},
 				httpSendFn: func(*http.Request) (*http.Response, error) {
 					return nil, errors.New("something went wrong")
 				},
 			},
-			event: core.Event{
+			event: sdk.Event{
 				Qualifiers: map[string]string{
 					"appID": "42",
 				},
@@ -190,7 +190,7 @@ func TestMonitorReportEventStatus(t *testing.T) {
 						"42": {},
 					},
 				},
-				prepareEventStatusMessageFn: func(core.Event) (*bytes.Buffer, error) {
+				prepareEventStatusMessageFn: func(sdk.Event) (*bytes.Buffer, error) {
 					return bytes.NewBufferString("this is a status message"), nil
 				},
 				httpSendFn: func(*http.Request) (*http.Response, error) {
@@ -199,7 +199,7 @@ func TestMonitorReportEventStatus(t *testing.T) {
 					}, nil
 				},
 			},
-			event: core.Event{
+			event: sdk.Event{
 				Qualifiers: map[string]string{
 					"appID": "42",
 				},
@@ -222,7 +222,7 @@ func TestMonitorReportEventStatus(t *testing.T) {
 						"42": {},
 					},
 				},
-				prepareEventStatusMessageFn: func(core.Event) (*bytes.Buffer, error) {
+				prepareEventStatusMessageFn: func(sdk.Event) (*bytes.Buffer, error) {
 					return bytes.NewBufferString("this is a status message"), nil
 				},
 				httpSendFn: func(*http.Request) (*http.Response, error) {
@@ -230,16 +230,18 @@ func TestMonitorReportEventStatus(t *testing.T) {
 						StatusCode: http.StatusOK,
 					}, nil
 				},
-				eventsClient: &coreTesting.MockEventsClient{
+				eventsClient: &sdkTesting.MockEventsClient{
 					UpdateSourceStateFn: func(
 						context.Context,
-						string, core.SourceState,
+						string,
+						sdk.SourceState,
+						*sdk.EventSourceStateUpdateOptions,
 					) error {
 						return errors.New("something went wrong")
 					},
 				},
 			},
-			event: core.Event{
+			event: sdk.Event{
 				Qualifiers: map[string]string{
 					"appID": "42",
 				},
@@ -262,7 +264,7 @@ func TestMonitorReportEventStatus(t *testing.T) {
 						"42": {},
 					},
 				},
-				prepareEventStatusMessageFn: func(core.Event) (*bytes.Buffer, error) {
+				prepareEventStatusMessageFn: func(sdk.Event) (*bytes.Buffer, error) {
 					return bytes.NewBufferString("this is a status message"), nil
 				},
 				httpSendFn: func(*http.Request) (*http.Response, error) {
@@ -270,16 +272,18 @@ func TestMonitorReportEventStatus(t *testing.T) {
 						StatusCode: http.StatusOK,
 					}, nil
 				},
-				eventsClient: &coreTesting.MockEventsClient{
+				eventsClient: &sdkTesting.MockEventsClient{
 					UpdateSourceStateFn: func(
 						context.Context,
-						string, core.SourceState,
+						string,
+						sdk.SourceState,
+						*sdk.EventSourceStateUpdateOptions,
 					) error {
 						return nil
 					},
 				},
 			},
-			event: core.Event{
+			event: sdk.Event{
 				Qualifiers: map[string]string{
 					"appID": "42",
 				},
@@ -297,7 +301,7 @@ func TestMonitorReportEventStatus(t *testing.T) {
 }
 
 func TestMonitorPrepareStatusMessage(t *testing.T) {
-	testEvent := core.Event{
+	testEvent := sdk.Event{
 		ObjectMeta: meta.ObjectMeta{
 			ID: "123456789",
 		},
@@ -305,9 +309,9 @@ func TestMonitorPrepareStatusMessage(t *testing.T) {
 		Labels: map[string]string{
 			"channelID": "hbo",
 		},
-		Worker: &core.Worker{
-			Status: core.WorkerStatus{
-				Phase: core.WorkerPhaseSucceeded,
+		Worker: &sdk.Worker{
+			Status: sdk.WorkerStatus{
+				Phase: sdk.WorkerPhaseSucceeded,
 			},
 		},
 		Summary: "It worked!",
