@@ -12,8 +12,10 @@ import (
 )
 
 func TestNewSlashCommandHandler(t *testing.T) {
-	s := NewSlashCommandHandler(&slashCommandService{})
-	require.NotNil(t, s.(*slashCommandHandler).service)
+	handler, ok :=
+		NewSlashCommandHandler(&slashCommandService{}).(*slashCommandHandler)
+	require.True(t, ok)
+	require.NotNil(t, handler.service)
 }
 
 func TestNewSlashCommandHandlerServeHTTP(t *testing.T) {

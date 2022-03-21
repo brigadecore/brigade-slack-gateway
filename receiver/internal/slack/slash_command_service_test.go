@@ -23,8 +23,10 @@ func TestNewSlashCommandService(t *testing.T) {
 		},
 	)
 	require.NoError(t, err)
-	require.NotNil(t, s.(*slashCommandService).eventsClient)
-	require.NotNil(t, s.(*slashCommandService).ackMsgTemplate)
+	svc, ok := s.(*slashCommandService)
+	require.True(t, ok)
+	require.NotNil(t, svc.eventsClient)
+	require.NotNil(t, svc.ackMsgTemplate)
 }
 
 func TestSlashCommandServiceHandle(t *testing.T) {
