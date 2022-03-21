@@ -6,7 +6,7 @@ run:
 linters:
   disable-all: true
   enable:
-  - bodyclose
+  # - bodyclose # Not yet working with Go 1.18
   - depguard
   # - dupl
   - errcheck
@@ -24,8 +24,9 @@ linters:
   - nakedret
   - prealloc
   - revive
-  - unparam
-  - unused
+  - unconvert
+  # - unparam # Not yet working with Go 1.18
+  # - unused # Not yet working with Go 1.18
 
 # all available settings for all linters
 linters-settings:
