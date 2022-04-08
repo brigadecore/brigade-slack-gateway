@@ -1,6 +1,6 @@
 SHELL ?= /bin/bash
 
-.DEFAULT_GOAL := build
+.DEFAULT_GOAL := push-images
 
 ################################################################################
 # Version details                                                              #
@@ -107,27 +107,6 @@ upload-code-coverage:
 	$(GO_DOCKER_CMD) codecov
 
 ################################################################################
-# Build                                                                        #
-################################################################################
-
-.PHONY: build
-build: build-images
-
-.PHONY: build-images
-build-images: build-receiver build-monitor
-
-.PHONY: build-%
-build-%:
-	docker buildx build \
-		-f $*/Dockerfile \
-		-t $(DOCKER_IMAGE_PREFIX)$*:$(IMMUTABLE_DOCKER_TAG) \
-		-t $(DOCKER_IMAGE_PREFIX)$*:$(MUTABLE_DOCKER_TAG) \
-		--build-arg VERSION=$(VERSION) \
-		--build-arg COMMIT=$(GIT_VERSION) \
-		--platform linux/amd64,linux/arm64 \
-		.
-
-################################################################################
 # Image security                                                               #
 ################################################################################
 
@@ -211,44 +190,3 @@ hack-kind-up:
 .PHONY: hack-kind-down
 hack-kind-down:
 	ctlptl delete -f hack/kind/cluster.yaml
-
-.PHONY: hack-build-%
-hack-build-%:
-	docker build \
-		-f $*/Dockerfile \
-		-t $(DOCKER_IMAGE_PREFIX)$*:$(IMMUTABLE_DOCKER_TAG) \
-		-t $(DOCKER_IMAGE_PREFIX)$*:$(MUTABLE_DOCKER_TAG) \
-		--build-arg VERSION='$(VERSION)' \
-		--build-arg COMMIT='$(GIT_VERSION)' \
-		.
-
-.PHONY: hack-push-images
-hack-push-images: hack-push-receiver hack-push-monitor
-
-.PHONY: hack-push-%
-hack-push-%: hack-build-%
-	docker push $(DOCKER_IMAGE_PREFIX)$*:$(IMMUTABLE_DOCKER_TAG)
-	docker push $(DOCKER_IMAGE_PREFIX)$*:$(MUTABLE_DOCKER_TAG)
-
-IMAGE_PULL_POLICY ?= Always
-
-.PHONY: hack-deploy
-hack-deploy:
-ifndef BRIGADE_API_TOKEN
-	@echo "BRIGADE_API_TOKEN must be defined" && false
-endif
-	helm dep up charts/brigade-slack-gateway && \
-	helm upgrade brigade-slack-gateway charts/brigade-slack-gateway \
-		--install \
-		--namespace brigade-slack-gateway \
-		--create-namespace \
-		--set receiver.image.repository=$(DOCKER_IMAGE_PREFIX)receiver \
-		--set receiver.image.tag=$(IMMUTABLE_DOCKER_TAG) \
-		--set receiver.image.pullPolicy=$(IMAGE_PULL_POLICY) \
-		--set monitor.image.repository=$(DOCKER_IMAGE_PREFIX)monitor \
-		--set monitor.image.tag=$(IMMUTABLE_DOCKER_TAG) \
-		--set monitor.image.pullPolicy=$(IMAGE_PULL_POLICY) \
-		--set brigade.apiToken=$(BRIGADE_API_TOKEN)
-
-.PHONY: hack
-hack: hack-push-images hack-deploy
