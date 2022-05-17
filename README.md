@@ -92,7 +92,7 @@ Please refer to Brigade's own documentation.
 
 Using Brigade 2's `brig` CLI, create a service account for the gateway to use:
 
-```console
+```shell
 $ brig service-account create \
     --id brigade-slack-gateway \
     --description brigade-slack-gateway
@@ -103,7 +103,7 @@ _It is your only opportunity to access this value, as Brigade does not save it._
 
 Authorize this service account to read all events and to create new ones:
 
-```console
+```shell
 $ brig role grant READER \
     --service-account brigade-slack-gateway
 
@@ -128,7 +128,7 @@ First, be sure you are using
 [Helm 3.7.0](https://github.com/helm/helm/releases/tag/v3.7.0) or greater and
 enable OCI support:
 
-```console
+```shell
 $ export HELM_EXPERIMENTAL_OCI=1
 ```
 
@@ -138,7 +138,7 @@ values file with said config.
 Use the following command to extract the full set of configuration options into
 a file you can modify:
 
-```console
+```shell
 $ helm inspect values oci://ghcr.io/brigadecore/brigade-slack-gateway \
     --version v0.3.1 > ~/brigade-slack-gateway-values.yaml
 ```
@@ -173,7 +173,7 @@ Edit `~/brigade-slack-gateway-values.yaml`, making the following changes:
 Save your changes to `~/brigade-slack-gateway-values.yaml` and use the following
 command to install the gateway using the above customizations:
 
-```console
+```shell
 $ helm install brigade-slack-gateway \
     oci://ghcr.io/brigadecore/brigade-slack-gateway \
     --version v0.3.1 \
@@ -189,7 +189,7 @@ $ helm install brigade-slack-gateway \
 If you overrode defaults and set `receiver.service.type` to `LoadBalancer`, use
 this command to find the gateway's public IP address:
 
-```console
+```shell
 $ kubectl get svc brigade-slack-gateway-receiver \
     --namespace brigade-slack-gateway \
     --output jsonpath='{.status.loadBalancer.ingress[0].ip}'
@@ -273,7 +273,7 @@ spec:
 Assuming this file were named `project.yaml`, you can create the project like
 so:
 
-```console
+```shell
 $ brig project create --file project.yaml
 ```
 
@@ -285,7 +285,7 @@ the `brigade.js` script that was embedded in the project definition.
 
 List the events for the `slack-demo` project to confirm this:
 
-```console
+```shell
 $ brig event list --project slack-demo
 ```
 
